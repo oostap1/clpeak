@@ -18,6 +18,7 @@ static const char *helpStr =
     "\n  --kernel-latency            selectively run kernel latency test"
     "\n  --all-tests                 run all above tests [default]"
     "\n  --enable-xml-dump           Dump results to xml file"
+    "\n  -s, --data-size             specify data size to test bandwith (bytes), default is 1/2 of max device allocation size"
     "\n  -f, --xml-file file_name    specify file name for xml dump"
     "\n  -v, --version               display version"
     "\n  -h, --help                  display help message"
@@ -67,6 +68,14 @@ int clPeak::parseArgs(int argc, char **argv)
     else if(strcmp(argv[i], "--use-event-timer") == 0)
     {
       useEventTimer = true;
+    }
+    else if((strcmp(argv[i], "-s") == 0) || (strcmp(argv[i], "--data-size") == 0))
+    {
+      if((i+1) < argc)
+      {
+        dataSize = strtoul(argv[i+1], NULL, 0);
+        i++;
+      }
     }
     else if((strcmp(argv[i], "--global-bandwidth") == 0)   || (strcmp(argv[i], "--compute-sp") == 0)
             || (strcmp(argv[i], "--compute-dp") == 0) || (strcmp(argv[i], "--compute-integer") == 0)

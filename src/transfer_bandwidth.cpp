@@ -15,6 +15,9 @@ int clPeak::runTransferBandwidthTest(cl::CommandQueue &queue, cl::Program &prog,
 
   uint64_t maxItems = devInfo.maxAllocSize / sizeof(float) / 2;
   uint64_t numItems = roundToMultipleOf(maxItems, devInfo.maxWGSize, devInfo.transferBWMaxSize);
+  if(dataSize>0){
+      numItems=dataSize/4;
+  }
 
   try
   {
@@ -236,6 +239,57 @@ int clPeak::runTransferBandwidthTest(cl::CommandQueue &queue, cl::Program &prog,
     log->xmlRecord("memcpy_to_mapped_ptr", gbps);
 
     ///////////////////////////////////////////////////////////////////////////
+
+
+    // memcpy to mapped ptr
+    log->print(TAB TAB TAB TAB "map/memcpy to mapped/unmap : ");
+    queue.finish();
+    timer.start();
+
+    timed = 0;
+    for(uint i=0; i<iters; i++)
+    {
+      cl::Event timeEvent;
+      void *mapPtr;
+      mapPtr = queue.enqueueMapBuffer(clBuffer, CL_TRUE, CL_MAP_WRITE, 0, (numItems * sizeof(float)));
+      memcpy(mapPtr, arr, (numItems * sizeof(float)));
+      queue.enqueueUnmapMemObject(clBuffer, mapPtr);
+      queue.finish();
+    }
+    timed += timer.stopAndTime();
+    timed /= static_cast<float>(iters);
+
+    gbps = ((float)numItems * sizeof(float)) / timed / 1e3f;
+    log->print(gbps);   log->print(NEWLINE);
+    log->xmlRecord("map_memcpy2mapped_unmap", gbps);
+
+    ///////////////////////////////////////////////////////////////////////////
+
+    // memcpy from mapped ptr
+    log->print(TAB TAB TAB TAB "map/memcpy from/unmap   : ");
+    queue.finish();
+
+    timer.start();
+    timed = 0;
+    for(uint i=0; i<iters; i++)
+    {
+      cl::Event timeEvent;
+      void *mapPtr;
+
+      mapPtr = queue.enqueueMapBuffer(clBuffer, CL_TRUE, CL_MAP_READ, 0, (numItems * sizeof(float)));
+      memcpy(arr, mapPtr, (numItems * sizeof(float)));
+      queue.enqueueUnmapMemObject(clBuffer, mapPtr);
+      queue.finish();
+    }
+    timed += timer.stopAndTime();
+    timed /= static_cast<float>(iters);
+
+    gbps = ((float)numItems * sizeof(float)) / timed / 1e3f;
+    log->print(gbps);   log->print(NEWLINE);
+    log->xmlRecord("map_memcpy_from_unmap", gbps);
+
+    ///////////////////////////////////////////////////////////////////////////
+
     log->xmlCloseTag();     // transfer_bandwidth
 
     if(arr)     delete [] arr;

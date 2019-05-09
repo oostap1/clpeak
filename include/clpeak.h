@@ -23,7 +23,7 @@ public:
 
   bool forcePlatform, forceDevice, useEventTimer;
   bool isGlobalBW, isComputeSP, isComputeDP, isComputeInt, isTransferBW, isKernelLatency;
-  ulong specifiedPlatform, specifiedDevice;
+  ulong specifiedPlatform, specifiedDevice, dataSize;
   logger *log;
 
   clPeak();

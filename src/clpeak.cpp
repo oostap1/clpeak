@@ -28,7 +28,7 @@ void stubOpenclReset();
 clPeak::clPeak(): forcePlatform(false), forceDevice(false), useEventTimer(false),
     isGlobalBW(true), isComputeSP(true), isComputeDP(true), isComputeInt(true),
     isTransferBW(true), isKernelLatency(true),
-    specifiedPlatform(0), specifiedDevice(0)
+    specifiedPlatform(0), specifiedDevice(0), dataSize(0)
 {
 }
 
