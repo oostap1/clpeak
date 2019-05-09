@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <clpeak.h>
 
 
@@ -260,7 +261,11 @@ int clPeak::runTransferBandwidthTest(cl::CommandQueue &queue, cl::Program &prog,
     timed /= static_cast<float>(iters);
 
     gbps = ((float)numItems * sizeof(float)) / timed / 1e3f;
-    log->print(gbps);   log->print(NEWLINE);
+    log->print(gbps);
+    char buffer[64];
+    snprintf(buffer,sizeof(buffer)," (%.2fms %d bytes)", timed/1000.0f, numItems*sizeof(float));
+    log->print(buffer);
+    log->print(NEWLINE);
     log->xmlRecord("map_memcpy2mapped_unmap", gbps);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -285,7 +290,10 @@ int clPeak::runTransferBandwidthTest(cl::CommandQueue &queue, cl::Program &prog,
     timed /= static_cast<float>(iters);
 
     gbps = ((float)numItems * sizeof(float)) / timed / 1e3f;
-    log->print(gbps);   log->print(NEWLINE);
+    log->print(gbps);
+    snprintf(buffer,sizeof(buffer)," (%.2fms %d bytes)", timed/1000.0f, numItems*sizeof(float));
+    log->print(buffer);
+    log->print(NEWLINE);
     log->xmlRecord("map_memcpy_from_unmap", gbps);
 
     ///////////////////////////////////////////////////////////////////////////
